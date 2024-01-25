@@ -1,3 +1,6 @@
+// sudo apt-get install libgsl-dev
+// ou sur fedora : sudo dnf install gsl-devel
+
 #ifndef MATRIX__H
 #define MATRIX__H
 
