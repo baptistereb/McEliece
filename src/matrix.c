@@ -1,5 +1,6 @@
 #include "matrix.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <gsl/gsl_matrix.h>
 #include <gsl/gsl_linalg.h>
 
@@ -15,6 +16,10 @@ void PrintMatrix(int size, float matrix[size][size], char * name) {
 }
 
 void InvertMatrix(int size, float matrix[size][size]) {
+	if(!isInversible(size, matrix)) {
+		fprintf(stderr, "Matrice non inversible\n");
+        exit(EXIT_FAILURE);
+	}
     gsl_matrix *matrice = gsl_matrix_alloc(size, size);
     gsl_matrix *inverse = gsl_matrix_alloc(size, size); 
     gsl_matrix *copie = gsl_matrix_alloc(size, size); //copie de la matrice d'origine (car gsl_linalg_invert_modifie la matrice d'entrée)
@@ -63,4 +68,68 @@ void TransverseMatrix(int size, float matrix[size][size]) {
             matrix[i][j] = temp[i][j];
         }
     }
+}
+
+void swapRows(int size, float matrix[size][size], int row1, int row2) {
+    for (int col = 0; col < size; col++) {
+        float temp = matrix[row1][col];
+        matrix[row1][col] = matrix[row2][col];
+        matrix[row2][col] = temp;
+    }
+}
+
+void rowOperation(int size, float matrix[size][size], int sourceRow, int targetRow, float multiplier) {
+    for (int col = 0; col < size; col++) {
+        matrix[targetRow][col] += multiplier * matrix[sourceRow][col];
+    }
+}
+
+float determinant(int size, float matrix[size][size]) {
+    float det = 1.0;
+
+    for (int i = 0; i < size; i++) {
+        // Recherche du pivot non nul dans la colonne courante
+        int pivotRow = -1;
+        for (int j = i; j < size; j++) {
+            if (matrix[j][i] != 0) {
+                pivotRow = j;
+                break;
+            }
+        }
+
+        // Si aucun pivot n'est trouvé
+        if (pivotRow == -1) {
+            return 0.0;
+        }
+
+        // Échange des lignes pour placer le pivot en haut
+        if (pivotRow != i) {
+            swapRows(size, matrix, i, pivotRow);
+            // Le déterminant change de signe lorsqu'on échange deux lignes
+            det = -det;
+        }
+
+        // Élimination des éléments sous le pivot
+        for (int j = i + 1; j < size; j++) {
+            float multiplier = matrix[j][i] / matrix[i][i];
+            rowOperation(size, matrix, i, j, -multiplier);
+        }
+
+        // Met à jour le déterminant avec le pivot
+        det *= matrix[i][i];
+    }
+
+    return det;
+}
+
+int isInversible(int size, float matrix[size][size]) {
+    float temp[size][size];
+
+    for (int i = 0; i < size; ++i) {
+        for (int j = 0; j < size; ++j) {
+            temp[j][i] = matrix[i][j];
+        }
+    }
+    float det = determinant(size, temp);
+    return det != 0.0;
 }
