@@ -1,6 +1,8 @@
 #include "matrix.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <openssl/rand.h>
 #include <gsl/gsl_matrix.h>
 #include <gsl/gsl_linalg.h>
 
@@ -123,13 +125,32 @@ float determinant(int size, float matrix[size][size]) {
 }
 
 int isInversible(int size, float matrix[size][size]) {
-    float temp[size][size];
+    float copy[size][size];
 
     for (int i = 0; i < size; ++i) {
         for (int j = 0; j < size; ++j) {
-            temp[j][i] = matrix[i][j];
+            copy[j][i] = matrix[i][j];
         }
     }
-    float det = determinant(size, temp);
+    float det = determinant(size, copy);
     return det != 0.0;
+}
+
+void generateSecureMatrix(int size, float matrix[size][size]) {
+    unsigned char buffer[size * size * sizeof(float)];
+
+    // on génére pas avec le temps pour augmenter l'entropie de la génération des clés
+    if (RAND_bytes(buffer, sizeof(buffer)) != 1) {
+        fprintf(stderr, "Erreur lors de la génération aléatoire sécurisée.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    for (int i = 0; i < size; ++i) {
+        for (int j = 0; j < size; ++j) {
+            int intValue;
+            memcpy(&intValue, buffer + sizeof(int) * (i * size + j), sizeof(int));
+            intValue=intValue>>15; // pour éviter l'érreur numérique : giga bancal comme méthode
+            matrix[i][j] = (float)intValue;
+        }
+    }
 }

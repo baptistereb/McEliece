@@ -1,5 +1,6 @@
 #include "main.h"
 #include "matrix.h"
+#include "keygen.h"
 #include <stdio.h>
 
 float test[3][3] = {
@@ -14,9 +15,20 @@ float test2[3][3] = { //non inversible
 };
 
 
-int main() {
-	PrintMatrix(3, test, "Matrice initiale\0");
-	InvertMatrix(3, test2);
-	PrintMatrix(3, test, "Matrice inverse\0");
+float test3[5][5];
+
+float test5[3][3];
+
+int main(int argc, char * argv[]) {
+	//generateSecureMatrix(5, test3);
+	//PrintMatrix(5, test3, "Matrice généré\0");
+	//GeneratePermutation(5,test3,10);
+	GenerateS(3,test5);
+	PrintMatrix(3,test5, "S");
+	InvertMatrix(3,test5);
+	PrintMatrix(3,test5, "S-1");
+	InvertMatrix(3,test5);
+	PrintMatrix(3,test5, "S");
+	//KeyGen(".");
 	return 0;
 }

@@ -18,4 +18,6 @@ float determinant(int size, float matrix[size][size]);
 
 int isInversible(int size, float matrix[size][size]);
 
+void generateSecureMatrix(int size, float matrix[size][size]);
+
 #endif
