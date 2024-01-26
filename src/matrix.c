@@ -164,3 +164,32 @@ void generateSecureMatrix(int size, float matrix[size][size]) {
         }
     }
 }
+
+int minimalHammingDistance(int size1, int size2, float matrix[size1][size2]) {
+    int minimal = 999;
+    for(int i=0;i<size1;i++) {
+        for(int j=0;j<size1;j++) {
+            if(i!=j) {
+                //on a le vecteur i != j
+                int HW=0;
+                for(int x=0;x<size2;x++) {
+                    if(matrix[i][x] != matrix[j][x]) HW++; 
+                }
+                if(HW<minimal) minimal = HW;
+            }
+        }
+    }
+    return minimal;
+}
+
+void multMatrix(int taille1, int taille2, int taille3, float matrix1[taille1][taille2], float matrix2[taille2][taille3], float result[taille1][taille3]) {
+    for (int i = 0; i < taille1; ++i) {
+        for (int j = 0; j < taille3; ++j) {
+            result[i][j] = 0.0;
+
+            for (int k = 0; k < taille2; ++k) {
+                result[i][j] += matrix1[i][k] * matrix2[k][j];
+            }
+        }
+    }
+}

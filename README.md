@@ -5,4 +5,4 @@ ou sur fedora :
 ```sudo dnf install gsl-devel```
 
 
-gcc inverse_matrice.c -o exe -lgsl -lgslcblas -lm && ./exe
+gcc src/* -I include -o exec -lgsl -lgslcblas -lm -lssl -lcrypto && ./exec

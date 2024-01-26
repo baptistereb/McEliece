@@ -62,10 +62,60 @@ void GenerateS(int size, float matrix[size][size]) {
     printf("Nombre d'itération : %d\n", iter);
 }
 
-void KeyGen(char rep[]) {
-    char folderName[200];
-    strcpy(folderName,rep);
-    strcat(folderName,"/.mceliece");
+void GenerateG(int size, int redondance, float matrix[size][size+redondance], int itermax) {
+    float temp[size][size+redondance];
+
+    for(int i=0;i<size;i++) {
+        for(int j=0;j<size;j++) {
+            matrix[i][j]=(i==j); //1 si i=j sinon 0
+            temp[i][j]=(i==j);
+        }
+    }
+
+    int maxdistance=0;
+    srand(time(NULL));
+    for(int iter=0;iter<itermax;iter++) {//on a l'identité sur le premier
+        for(int i=0;i<size;i++) {
+            for(int j=size;j<size+redondance;j++) {
+                temp[i][j]=(float) (rand()%2); //1 si i=j sinon 0
+            }
+        }
+        if(minimalHammingDistance(size,size+redondance, temp)>maxdistance){
+            maxdistance=minimalHammingDistance(size,size+redondance, temp);
+            for(int i=0;i<size;i++) {
+                for(int j=0;j<size+redondance;j++) {
+                    matrix[i][j]=temp[i][j];
+                }
+            }
+        }
+    }
+}
+
+void EcrireMatrice(FILE * fichier, int taille1, int taille2, float matrix[taille1][taille2]) {
+    if (fichier == NULL) {
+        perror("Erreur : Impossible d'ouvrir le fichier.");
+        exit(EXIT_FAILURE);
+    }
+
+    // Écrire la matrice dans le fichier
+    for (int i = 0; i < taille1; i++) {
+        for (int j = 0; j < taille2; j++) {
+            // Écrire la valeur avec toutes les décimales
+            fprintf(fichier, "%.10f", matrix[i][j]);
+
+            // Ajouter un espace entre les valeurs
+            fprintf(fichier, " ");
+
+            // Vous pouvez ajuster la précision en changeant le nombre dans "%.10f"
+        }
+
+        // Retour à la ligne après chaque ligne de la matrice
+        fprintf(fichier, "\n");
+    }
+}
+
+void KeyGen(int size, int redondance) {
+    char folderName[]="./.mceliece";
     char publicKeyFile[] = ".public_key";
     char privateKeyFile[] = ".private_key";
 
@@ -73,18 +123,33 @@ void KeyGen(char rep[]) {
     if (mkdir(folderName, 0700) == -1) {
         perror("Erreur lors de la création du répertoire .mceliece");
         exit(EXIT_FAILURE);
-    }
+    }    
 
     if (chdir(folderName) == -1) {
-        perror("Erreur lors du changement de répertoire .mcelice");
+        perror("Erreur lors du changement de répertoire .mceliece");
         exit(EXIT_FAILURE);
     }
+
+    float P[size+redondance][size+redondance];
+    float S[size][size];
+    float G[size][size+redondance];
+    float SG[size][size+redondance];
+    float SGP[size][size+redondance];
+
+    GenerateP(size+redondance, P, 15);
+    GenerateS(size, S);
+    GenerateG(size, redondance, G, 10000);
+
+    multMatrix(size, size, size+redondance, S, G, SG);
+    PrintMatrixRect(size, size+redondance, SG, "SG");
+    multMatrix(size, size+redondance, size+redondance, SG, P, SGP);
 
     FILE* publicFile = fopen(publicKeyFile, "w");
     if (publicFile == NULL) {
         perror("Erreur lors de la création du fichier .public_key");
         exit(EXIT_FAILURE);
     }
+    EcrireMatrice(publicFile, size+redondance, size+redondance, SGP);
     fclose(publicFile);
 
     FILE* privateFile = fopen(privateKeyFile, "w");
@@ -92,6 +157,13 @@ void KeyGen(char rep[]) {
         perror("Erreur lors de la création du fichier .private_key");
         exit(EXIT_FAILURE);
     }
+    fprintf(publicFile, "%d %d\n", size, size+redondance);
+    fprintf(publicFile, "########################### S\n");
+    EcrireMatrice(privateFile, size, size, S);
+    fprintf(publicFile, "########################### G\n");
+    EcrireMatrice(privateFile, size, size+redondance, G);
+    fprintf(publicFile, "########################### P\n");
+    EcrireMatrice(privateFile, size+redondance, size+redondance, P);
     fclose(privateFile);
 
     if (chdir("..") == -1) {

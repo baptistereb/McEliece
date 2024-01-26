@@ -22,4 +22,8 @@ int isInversible(int size, float matrix[size][size]);
 
 void generateSecureMatrix(int size, float matrix[size][size]);
 
+int minimalHammingDistance(int size1, int size2, float matrix[size1][size2]);
+
+void multMatrix(int taille1, int taille2, int taille3, float matrix1[taille1][taille2], float matrix2[taille2][taille3], float result[taille1][taille3]);
+
 #endif
