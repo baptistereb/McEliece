@@ -18,17 +18,20 @@ float test2[3][3] = { //non inversible
 float test3[5][5];
 
 float test5[3][3];
+float test6[5][5];
+float test10[5][7];
 
 int main(int argc, char * argv[]) {
 	//generateSecureMatrix(5, test3);
 	//PrintMatrix(5, test3, "Matrice généré\0");
 	//GeneratePermutation(5,test3,10);
-	GenerateS(3,test5);
-	PrintMatrix(3,test5, "S");
-	InvertMatrix(3,test5);
-	PrintMatrix(3,test5, "S-1");
-	InvertMatrix(3,test5);
-	PrintMatrix(3,test5, "S");
+	GenerateS(5,test6);
+	PrintMatrix(5,test6, "S");
+	InvertMatrix(5,test6);
+	PrintMatrix(5,test6, "S-1");
+	InvertMatrix(5,test6);
+	PrintMatrix(5,test6, "S");
+
 	//KeyGen(".");
 	return 0;
 }

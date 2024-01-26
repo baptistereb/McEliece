@@ -34,10 +34,32 @@ void GenerateP(int size, float matrix[size][size], int nb_permutation) {
 }
 
 void GenerateS(int size, float matrix[size][size]) {
-    generateSecureMatrix(size, matrix);
-    while(!isInversible(size,matrix)) {
+    float inverse[size][size];
+    int different=1;
+    int iter=0;
+    while(different==1) {
         generateSecureMatrix(size, matrix);
+        while(!isInversible(size,matrix)) {
+            generateSecureMatrix(size, matrix);
+        }
+        for(int i=0; i<size;i++) {
+            for(int j=0; j<size;j++) {
+                inverse[i][j]=matrix[i][j];
+            }
+        }
+        InvertMatrix(size, inverse);
+        InvertMatrix(size, inverse);
+        different=0;
+        for(int i=0; i<size;i++) {
+            for(int j=0; j<size;j++) {
+                if(((int)inverse[i][j])!=((int)matrix[i][j])) {
+                    different=1;
+                }
+            }
+        }
+        iter++;
     }
+    printf("Nombre d'itération : %d\n", iter);
 }
 
 void KeyGen(char rep[]) {

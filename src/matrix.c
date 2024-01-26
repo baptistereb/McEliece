@@ -7,21 +7,31 @@
 #include <gsl/gsl_linalg.h>
 
 void PrintMatrix(int size, float matrix[size][size], char * name) {
-	printf("------------------------ %s\n", name);
-	for(int i=0; i<size;i++) {
-		for(int j=0; j<size;j++) {
-			printf("%f ", matrix[i][j]);
-		}
-		printf("\n");
-	}
-	printf("------------------------\n");
+    printf("------------------------ %s\n", name);
+    for(int i=0; i<size;i++) {
+        for(int j=0; j<size;j++) {
+            printf("%f ", matrix[i][j]);
+        }
+        printf("\n");
+    }
+    printf("------------------------\n");
+}
+void PrintMatrixRect(int size1, int size2, float matrix[size1][size2], char * name) {
+    printf("------------------------ %s\n", name);
+    for(int i=0; i<size1;i++) {
+        for(int j=0; j<size2;j++) {
+            printf("%f ", matrix[i][j]);
+        }
+        printf("\n");
+    }
+    printf("------------------------\n");
 }
 
 void InvertMatrix(int size, float matrix[size][size]) {
-	if(!isInversible(size, matrix)) {
+	/*if(!isInversible(size, matrix)) {
 		fprintf(stderr, "Matrice non inversible\n");
         exit(EXIT_FAILURE);
-	}
+	}*/
     gsl_matrix *matrice = gsl_matrix_alloc(size, size);
     gsl_matrix *inverse = gsl_matrix_alloc(size, size); 
     gsl_matrix *copie = gsl_matrix_alloc(size, size); //copie de la matrice d'origine (car gsl_linalg_invert_modifie la matrice d'entrée)

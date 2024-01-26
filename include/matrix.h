@@ -6,6 +6,8 @@
 
 void PrintMatrix(int size, float matrix[size][size], char * name);
 
+void PrintMatrixRect(int size1, int size2, float matrix[size1][size2], char * name);
+
 void InvertMatrix(int size, float matrix[size][size]);
 
 void TransverseMatrix(int size, float matrix[size][size]);
