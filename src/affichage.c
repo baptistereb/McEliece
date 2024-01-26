@@ -17,6 +17,75 @@ void clearInputBuffer() {
     while ((c = getchar()) != '\n' && c != EOF);
 }
 
+int nbligne(char *nomFichier) {
+    FILE *fichier = fopen(nomFichier, "r");
+
+    if (fichier == NULL) {
+        fprintf(stderr, "Impossible d'ouvrir le fichier %s.\n", nomFichier);
+        exit(EXIT_FAILURE);
+    }
+
+    int nbligne = 0;
+    char ligne[2000];
+
+    while (fgets(ligne, sizeof(ligne), fichier) != NULL) {
+        nbligne++;
+    }
+
+    fclose(fichier);
+
+    return nbligne;
+}
+
+void LireClePublique(char * fichiercle, int taille, float matrix[taille][taille]) {
+    FILE *fichier;
+    fichier = fopen( fichiercle, "r");
+
+    if (fichier == NULL) {
+        fprintf(stderr, "Erreur : Impossible d'ouvrir le fichier %s\n", fichiercle);
+		exit(EXIT_FAILURE);
+    }
+
+
+    printf("\e[45;37;1m  Clé publique :\e[0m\e[45;37m");
+    for(int i=0;i<65;i++) printf(" ");
+    printf("\e[35;47m\n██");
+	char caractere;
+    char buffer[100];
+    int index = 0;
+
+    int i = 0;
+    int j = 0;
+
+    while ((caractere = fgetc(fichier)) != EOF) {
+        if (caractere == ' ') {
+            buffer[index] = '\0';
+
+            if(buffer!="") {
+            	float nombre = atof(buffer);
+            	if(taille>0) {
+            		matrix[i][j]=nombre;
+            		j++;
+            	}
+            	printf("%-10d", (int)nombre);
+            }
+
+            index = 0;
+            printf(" ");
+        } else if(caractere == '\n') {
+        	j=0;
+        	i++;
+        	printf("██\n██");
+        } else {
+            buffer[index++] = caractere;
+        }
+    }
+
+    for(int i=0;i<79;i++) printf("█");
+   	printf("\e[0m");
+    fclose(fichier);
+}
+
 void Affichage() {
 
 	char userInput;
@@ -48,6 +117,10 @@ void Affichage() {
 				*/
 				struct stat st;
 			    if (stat(".mceliece", &st) == 0) {
+			    	float factice[0][0];
+			        LireClePublique(".mceliece/.public_key", 0, factice);
+
+			        printf("\n\n");
 			        printf("\e[31;47m Le .mceliece existe déjà, souhaitez-vous l'écraser ? \e[41;05;37m [o/n] \e[0m ");
 				    scanf(" %c", &userInput);
 				    switch (userInput) {
