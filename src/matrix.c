@@ -6,28 +6,28 @@
 #include <gsl/gsl_matrix.h>
 #include <gsl/gsl_linalg.h>
 
-void PrintMatrix(int size, float matrix[size][size], char * name) {
+void PrintMatrix(int size, int matrix[size][size], char * name) {
     printf("------------------------ %s\n", name);
     for(int i=0; i<size;i++) {
         for(int j=0; j<size;j++) {
-            printf("%f ", matrix[i][j]);
+            printf("%d ", matrix[i][j]);
         }
         printf("\n");
     }
     printf("------------------------\n");
 }
-void PrintMatrixRect(int size1, int size2, float matrix[size1][size2], char * name) {
+void PrintMatrixRect(int size1, int size2, int matrix[size1][size2], char * name) {
     printf("------------------------ %s\n", name);
     for(int i=0; i<size1;i++) {
         for(int j=0; j<size2;j++) {
-            printf("%f ", matrix[i][j]);
+            printf("%d ", matrix[i][j]);
         }
         printf("\n");
     }
     printf("------------------------\n");
 }
 
-void InvertMatrix(int size, float matrix[size][size]) {
+void InvertMatrix(int size, int matrix[size][size]) {
 	/*if(!isInversible(size, matrix)) {
 		fprintf(stderr, "Matrice non inversible\n");
         exit(EXIT_FAILURE);
@@ -56,7 +56,8 @@ void InvertMatrix(int size, float matrix[size][size]) {
 
     for (size_t i = 0; i < size; ++i) {
         for (size_t j = 0; j < size; ++j) {
-            matrix[i][j]=gsl_matrix_get(inverse, i, j);
+            matrix[i][j]=((int)gsl_matrix_get(inverse, i, j))%2;
+            if(matrix[i][j]==-1) matrix[i][j]=1;
         }
     }
 
@@ -66,8 +67,8 @@ void InvertMatrix(int size, float matrix[size][size]) {
     gsl_permutation_free(p);
 }
 
-void TransverseMatrix(int size, float matrix[size][size]) {
-    float temp[size][size];
+void TransverseMatrix(int size, int matrix[size][size]) {
+    int temp[size][size];
 
     for (int i = 0; i < size; ++i) {
         for (int j = 0; j < size; ++j) {
@@ -82,22 +83,22 @@ void TransverseMatrix(int size, float matrix[size][size]) {
     }
 }
 
-void swapRows(int size, float matrix[size][size], int row1, int row2) {
+void swapRows(int size, int matrix[size][size], int row1, int row2) {
     for (int col = 0; col < size; col++) {
-        float temp = matrix[row1][col];
+        int temp = matrix[row1][col];
         matrix[row1][col] = matrix[row2][col];
         matrix[row2][col] = temp;
     }
 }
 
-void rowOperation(int size, float matrix[size][size], int sourceRow, int targetRow, float multiplier) {
+void rowOperation(int size, int matrix[size][size], int sourceRow, int targetRow, int multiplier) {
     for (int col = 0; col < size; col++) {
         matrix[targetRow][col] += multiplier * matrix[sourceRow][col];
     }
 }
 
-float determinant(int size, float matrix[size][size]) {
-    float det = 1.0;
+int determinant(int size, int matrix[size][size]) {
+    int det = 1;
 
     for (int i = 0; i < size; i++) {
         // Recherche du pivot non nul dans la colonne courante
@@ -111,7 +112,7 @@ float determinant(int size, float matrix[size][size]) {
 
         // Si aucun pivot n'est trouvé
         if (pivotRow == -1) {
-            return 0.0;
+            return 0;
         }
 
         // Échange des lignes pour placer le pivot en haut
@@ -123,7 +124,7 @@ float determinant(int size, float matrix[size][size]) {
 
         // Élimination des éléments sous le pivot
         for (int j = i + 1; j < size; j++) {
-            float multiplier = matrix[j][i] / matrix[i][i];
+            int multiplier = matrix[j][i] / matrix[i][i];
             rowOperation(size, matrix, i, j, -multiplier);
         }
 
@@ -134,38 +135,27 @@ float determinant(int size, float matrix[size][size]) {
     return det;
 }
 
-int isInversible(int size, float matrix[size][size]) {
-    float copy[size][size];
+int isInversible(int size, int matrix[size][size]) {
+    int copy[size][size];
 
     for (int i = 0; i < size; ++i) {
         for (int j = 0; j < size; ++j) {
             copy[j][i] = matrix[i][j];
         }
     }
-    float det = determinant(size, copy);
-    return det != 0.0;
+    int det = determinant(size, copy);
+    return det != 0;
 }
 
-void generateSecureMatrix(int size, float matrix[size][size]) {
-    unsigned char buffer[size * size * sizeof(float)];
-
-    // on génére pas avec le temps pour augmenter l'entropie de la génération des clés
-    if (RAND_bytes(buffer, sizeof(buffer)) != 1) {
-        fprintf(stderr, "Erreur lors de la génération aléatoire sécurisée.\n");
-        exit(EXIT_FAILURE);
-    }
-
+void generateSecureMatrix(int size, int matrix[size][size]) {
     for (int i = 0; i < size; ++i) {
         for (int j = 0; j < size; ++j) {
-            int intValue;
-            memcpy(&intValue, buffer + sizeof(int) * (i * size + j), sizeof(int));
-            intValue=intValue>>15; // pour éviter l'érreur numérique : giga bancal comme méthode
-            matrix[i][j] = (float)intValue;
+            matrix[i][j] = rand() % 2;  // Génère un nombre aléatoire soit 0, soit 1
         }
     }
 }
 
-int minimalHammingDistance(int size1, int size2, float matrix[size1][size2]) {
+int minimalHammingDistance(int size1, int size2, int matrix[size1][size2]) {
     int minimal = 999;
     for(int i=0;i<size1;i++) {
         for(int j=0;j<size1;j++) {
@@ -182,7 +172,7 @@ int minimalHammingDistance(int size1, int size2, float matrix[size1][size2]) {
     return minimal;
 }
 
-void multMatrix(int taille1, int taille2, int taille3, float matrix1[taille1][taille2], float matrix2[taille2][taille3], float result[taille1][taille3]) {
+void multMatrix(int taille1, int taille2, int taille3, int matrix1[taille1][taille2], int matrix2[taille2][taille3], int result[taille1][taille3]) {
     for (int i = 0; i < taille1; ++i) {
         for (int j = 0; j < taille3; ++j) {
             result[i][j] = 0.0;
@@ -190,6 +180,8 @@ void multMatrix(int taille1, int taille2, int taille3, float matrix1[taille1][ta
             for (int k = 0; k < taille2; ++k) {
                 result[i][j] += matrix1[i][k] * matrix2[k][j];
             }
+
+            result[i][j]=result[i][j]%2;
         }
     }
 }

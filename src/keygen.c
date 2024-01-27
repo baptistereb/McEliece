@@ -8,7 +8,7 @@
 #include <unistd.h>
 #include <string.h>
 
-void GenerateP(int size, float matrix[size][size], int nb_permutation) {
+void GenerateP(int size, int matrix[size][size], int nb_permutation) {
     for(int i=0;i<size;i++) {
         for(int j=0;j<size;j++) {
             matrix[i][j]=(i==j); //1 si i=j sinon 0
@@ -33,14 +33,16 @@ void GenerateP(int size, float matrix[size][size], int nb_permutation) {
     }
 }
 
-void GenerateS(int size, float matrix[size][size]) {
-    float inverse[size][size];
+void GenerateS(int size, int matrix[size][size]) {
+    int inverse[size][size];
     int different=1;
     int iter=0;
     while(different==1) {
         generateSecureMatrix(size, matrix);
+        iter++;
         while(!isInversible(size,matrix)) {
             generateSecureMatrix(size, matrix);
+            iter++;
         }
         for(int i=0; i<size;i++) {
             for(int j=0; j<size;j++) {
@@ -48,22 +50,22 @@ void GenerateS(int size, float matrix[size][size]) {
             }
         }
         InvertMatrix(size, inverse);
-        InvertMatrix(size, inverse);
+        int result[size][size];
+        multMatrix(size, size, size, matrix, inverse, result);
         different=0;
         for(int i=0; i<size;i++) {
             for(int j=0; j<size;j++) {
-                if(((int)inverse[i][j])!=((int)matrix[i][j])) {
+                if(result[i][j]!=((i == j) ? 1 : 0)) {
                     different=1;
                 }
             }
         }
-        iter++;
     }
-    printf("Nombre d'itération : %d\n", iter);
+    //printf("Nombre d'itérations : %d\n", iter);
 }
 
-void GenerateG(int size, int redondance, float matrix[size][size+redondance], int itermax) {
-    float temp[size][size+redondance];
+void GenerateG(int size, int redondance, int matrix[size][size+redondance], int itermax) {
+    int temp[size][size+redondance];
 
     for(int i=0;i<size;i++) {
         for(int j=0;j<size;j++) {
@@ -77,7 +79,7 @@ void GenerateG(int size, int redondance, float matrix[size][size+redondance], in
     for(int iter=0;iter<itermax;iter++) {//on a l'identité sur le premier
         for(int i=0;i<size;i++) {
             for(int j=size;j<size+redondance;j++) {
-                temp[i][j]=(float) (rand()%2); //1 si i=j sinon 0
+                temp[i][j]=(int) (rand()%2); //1 si i=j sinon 0
             }
         }
         if(minimalHammingDistance(size,size+redondance, temp)>maxdistance){
@@ -91,7 +93,7 @@ void GenerateG(int size, int redondance, float matrix[size][size+redondance], in
     }
 }
 
-void EcrireMatrice(FILE * fichier, int taille1, int taille2, float matrix[taille1][taille2]) {
+void EcrireMatrice(FILE * fichier, int taille1, int taille2, int matrix[taille1][taille2]) {
     if (fichier == NULL) {
         perror("Erreur : Impossible d'ouvrir le fichier.");
         exit(EXIT_FAILURE);
@@ -101,7 +103,7 @@ void EcrireMatrice(FILE * fichier, int taille1, int taille2, float matrix[taille
     for (int i = 0; i < taille1; i++) {
         for (int j = 0; j < taille2; j++) {
             // Écrire la valeur avec toutes les décimales
-            fprintf(fichier, "%.10f", matrix[i][j]);
+            fprintf(fichier, "%d", matrix[i][j]);
 
             // Ajouter un espace entre les valeurs
             fprintf(fichier, " ");
@@ -130,18 +132,17 @@ void KeyGen(int size, int redondance) {
         exit(EXIT_FAILURE);
     }
 
-    float P[size+redondance][size+redondance];
-    float S[size][size];
-    float G[size][size+redondance];
-    float SG[size][size+redondance];
-    float SGP[size][size+redondance];
-
+    int P[size+redondance][size+redondance];
+    int S[size][size];
+    int G[size][size+redondance];
+    int SG[size][size+redondance];
+    int SGP[size][size+redondance];
     GenerateP(size+redondance, P, 15);
     GenerateS(size, S);
     GenerateG(size, redondance, G, 10000);
 
     multMatrix(size, size, size+redondance, S, G, SG);
-    PrintMatrixRect(size, size+redondance, SG, "SG");
+    //PrintMatrixRect(size, size+redondance, SG, "SG");
     multMatrix(size, size+redondance, size+redondance, SG, P, SGP);
 
     FILE* publicFile = fopen(publicKeyFile, "w");

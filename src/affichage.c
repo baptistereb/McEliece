@@ -38,7 +38,7 @@ int nbligne(char *nomFichier) {
     return nbligne;
 }
 
-void LireClePublique(char * fichiercle, int taille, float matrix[taille][taille]) {
+void LireClePublique(char * fichiercle, int taille, int matrix[taille][taille]) {
     FILE *fichier;
     fichier = fopen(fichiercle, "r");
 
@@ -49,7 +49,7 @@ void LireClePublique(char * fichiercle, int taille, float matrix[taille][taille]
 
 
     printf("\e[45;37;1m  Clé publique :\e[0m\e[45;37m");
-    for(int i=0;i<65;i++) printf(" ");
+    for(int i=0;i<10;i++) printf(" ");
     printf("\e[35;47m\n██");
 	char caractere;
     char buffer[100];
@@ -63,12 +63,13 @@ void LireClePublique(char * fichiercle, int taille, float matrix[taille][taille]
             buffer[index] = '\0';
 
             if(buffer!="") {
-            	float nombre = atof(buffer);
+            	int nombre = atof(buffer);
             	if(taille>0) {
             		matrix[i][j]=nombre;
             		j++;
             	}
-            	printf("%-10d", (int)nombre);
+            	//printf("%-10d", (int)nombre);
+            	printf("%d", nombre);
             }
 
             index = 0;
@@ -82,7 +83,7 @@ void LireClePublique(char * fichiercle, int taille, float matrix[taille][taille]
         }
     }
 
-    for(int i=0;i<79;i++) printf("█");
+    for(int i=0;i<24;i++) printf("█");
    	printf("\e[0m");
     fclose(fichier);
 }
@@ -117,7 +118,7 @@ void Affichage() {
 				*/
 				struct stat st;
 			    if (stat(".mceliece", &st) == 0) {
-			    	float factice[0][0];
+			    	int factice[0][0];
 			        LireClePublique(".mceliece/.public_key", 0, factice);
 
 			        printf("\n\n");
@@ -129,14 +130,14 @@ void Affichage() {
 							remove(".mceliece/.public_key");
 							remove(".mceliece/");
 							printf("\e[5;97;49mKeygen...\e[0m\n");
-							KeyGen(4,3);
+							KeyGen(8,3);
 							break;
 						default:
 							break;
 					}
 			    } else {
 					printf("\e[5;97;49mKeygen...\e[0m\n");
-					KeyGen(4,3);
+					KeyGen(8,3);
 			    }
 				break;
 			case 'c':
@@ -159,7 +160,7 @@ void Affichage() {
 			    int sz=nbligne(buffer);
 			    while (getchar() != '\n');
 			    if(sz>0) {
-			    	float public_key[sz][sz];
+			    	int public_key[sz][sz];
 			    	LireClePublique(buffer, sz, public_key);
 			    	printf("\n\n");
 			    	while (getchar() != '\n');
