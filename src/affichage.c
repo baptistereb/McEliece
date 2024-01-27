@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
+#include <string.h>
 
 void clearTerminal() {
     #ifdef _WIN32
@@ -39,7 +40,7 @@ int nbligne(char *nomFichier) {
 
 void LireClePublique(char * fichiercle, int taille, float matrix[taille][taille]) {
     FILE *fichier;
-    fichier = fopen( fichiercle, "r");
+    fichier = fopen(fichiercle, "r");
 
     if (fichier == NULL) {
         fprintf(stderr, "Erreur : Impossible d'ouvrir le fichier %s\n", fichiercle);
@@ -89,7 +90,6 @@ void LireClePublique(char * fichiercle, int taille, float matrix[taille][taille]
 void Affichage() {
 
 	char userInput;
-	char buffer[100];
 
 	while("c vrai") {
 		clearTerminal();
@@ -140,10 +140,34 @@ void Affichage() {
 			    }
 				break;
 			case 'c':
-				printf("Ecrire :");
-				break;
+				clearTerminal();
+				printf("\e[92;1m█████████████████████████████\e[0m\n");
+			    printf("\e[92;1m██\e[30;47m k : KeyGen              \e[92;1m██\e[0m\n");
+			    printf("\e[92;1m██\e[37;40m c : Ecrire un message   \e[92;1m██\e[0m\n");
+			    printf("\e[92;1m██\e[30;47m d : Decoder un message  \e[92;1m██\e[0m \n");
+				printf("\e[92;1m█████████████████████████████\e[0m\n\n");
+
+				char buffer[256];
+				printf("Ou se trouve la clé publique de votre destinataire ? ('-' pour utilier la votre) ");
+			    scanf("%s", buffer);
+			   	
+
+			    if (buffer[0]=='-') {
+					strcpy(buffer, ".mceliece/.public_key");
+			    }			    
+
+			    int sz=nbligne(buffer);
+			    while (getchar() != '\n');
+			    if(sz>0) {
+			    	float public_key[sz][sz];
+			    	LireClePublique(buffer, sz, public_key);
+			    	printf("\n\n");
+			    	while (getchar() != '\n');
+			    }
+			    break;
 			case 'd':
 				printf("Lecture...\n");
+				break;
 			default:
 				break;
 		}
