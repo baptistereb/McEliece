@@ -98,20 +98,12 @@ void EcrireMatrice(FILE * fichier, int taille1, int taille2, int matrix[taille1]
         perror("Erreur : Impossible d'ouvrir le fichier.");
         exit(EXIT_FAILURE);
     }
-
-    // Écrire la matrice dans le fichier
     for (int i = 0; i < taille1; i++) {
         for (int j = 0; j < taille2; j++) {
-            // Écrire la valeur avec toutes les décimales
             fprintf(fichier, "%d", matrix[i][j]);
 
-            // Ajouter un espace entre les valeurs
             fprintf(fichier, " ");
-
-            // Vous pouvez ajuster la précision en changeant le nombre dans "%.10f"
         }
-
-        // Retour à la ligne après chaque ligne de la matrice
         fprintf(fichier, "\n");
     }
 }

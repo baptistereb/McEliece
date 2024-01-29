@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <string.h>
+#include <encrypt.h>
 
 void clearTerminal() {
     #ifdef _WIN32
@@ -158,11 +159,17 @@ void Affichage() {
 			    }			    
 
 			    int sz=nbligne(buffer);
+			    char msg[1];
 			    while (getchar() != '\n');
 			    if(sz>0) {
 			    	int public_key[sz][sz];
+			    	printf("\n");
 			    	LireClePublique(buffer, sz, public_key);
 			    	printf("\n\n");
+			    	printf("Que souhaitez-vous écrire ? (1char) ");
+			    	scanf("%c", msg[0]);
+			    	printf("Chiffré : %s", encrypt(1,msg, sz, public_key));
+			    	while (getchar() != '\n');
 			    	while (getchar() != '\n');
 			    }
 			    break;
