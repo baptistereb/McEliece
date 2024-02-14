@@ -5,6 +5,7 @@
 #include <sys/stat.h>
 #include <string.h>
 #include <encrypt.h>
+#define MAX_LENGTH 255
 
 void clearTerminal() {
     #ifdef _WIN32
@@ -159,17 +160,16 @@ void Affichage() {
 			    }			    
 
 			    int sz=nbligne(buffer);
-			    char msg[1];
+			    char msg[MAX_LENGTH];
 			    while (getchar() != '\n');
 			    if(sz>0) {
 			    	int public_key[sz][sz];
 			    	printf("\n");
 			    	LireClePublique(buffer, sz, public_key);
 			    	printf("\n\n");
-			    	printf("Que souhaitez-vous écrire ? (1char) ");
-			    	scanf("%c", msg[0]);
-			    	printf("Chiffré : %s", encrypt(1,msg, sz, public_key));
-			    	while (getchar() != '\n');
+			    	printf("Que souhaitez-vous chiffrer ? ");
+			    	fgets(msg, sizeof(msg), stdin);
+			    	printf("Chiffré : %s", encrypt(strlen(msg)-1,msg, sz, public_key)); //strlen(msg)-1 car on compte pas le fin de chaine
 			    	while (getchar() != '\n');
 			    }
 			    break;
