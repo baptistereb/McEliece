@@ -5,6 +5,7 @@
 #include <sys/stat.h>
 #include <string.h>
 #include <encrypt.h>
+#include <decrypt.h>
 #define MAX_LENGTH 255
 
 void clearTerminal() {
@@ -38,6 +39,20 @@ int nbligne(char *nomFichier) {
     fclose(fichier);
 
     return nbligne;
+}
+
+void privateShape(char *nomFichier, int * size1, int * size2) {
+    FILE *fichier;
+    fichier = fopen(nomFichier, "r");
+
+    if (fichier == NULL) {
+        fprintf(stderr, "Impossible d'ouvrir le fichier %s.\n", nomFichier);
+        exit(EXIT_FAILURE);
+    }
+
+    fscanf(fichier, "%d %d", size1, size2);
+
+    fclose(fichier);
 }
 
 void LireClePublique(char * fichiercle, int taille, int matrix[taille][taille]) {
@@ -88,6 +103,9 @@ void LireClePublique(char * fichiercle, int taille, int matrix[taille][taille]) 
     for(int i=0;i<24;i++) printf("█");
    	printf("\e[0m");
     fclose(fichier);
+}
+
+void LireClePrive(char * nomFichier, int size1, int size2, int ** S, int ** G, int ** P) {
 }
 
 void Affichage() {
@@ -174,8 +192,30 @@ void Affichage() {
 			    }
 			    break;
 			case 'd':
-				printf("Lecture...\n");
-				break;
+				clearTerminal();
+				printf("\e[92;1m█████████████████████████████\e[0m\n");
+			    printf("\e[92;1m██\e[30;47m k : KeyGen              \e[92;1m██\e[0m\n");
+			    printf("\e[92;1m██\e[30;47m c : Ecrire un message   \e[92;1m██\e[0m\n");
+			    printf("\e[92;1m██\e[37;40m d : Decoder un message  \e[92;1m██\e[0m \n");
+				printf("\e[92;1m█████████████████████████████\e[0m\n\n");
+
+		    	int size1,size2;
+		    	privateShape(".mceliece/.private_key", &size1, &size2);
+		    	int ** S = malloc(size1 * sizeof(int*));
+		    	int ** G = malloc(size1 * sizeof(int*));
+		    	int ** P = malloc(size2 * sizeof(int*));
+		    	for(int i=0;i<size1;i++) S[i]=malloc(size1*sizeof(int));
+		    	for(int i=0;i<size1;i++) G[i]=malloc(size2*sizeof(int));
+		    	for(int i=0;i<size2;i++) P[i]=malloc(size2*sizeof(int));
+		    	LireClePrive(".mceliece/.private_key", size1, size2, S, G, P);
+
+		    	char chiffr[8*MAX_LENGTH];
+		    	printf("Que souhaitez-vous dechiffrer ? ");
+		    	fgets(chiffr, sizeof(chiffr), stdin);
+		    	//printf("Clair : %s", decrypt(strlen(chiffr)-1,chiffr, size1, size2, S,G,P)); //strlen(msg)-1 car on compte pas le fin de chaine
+		    	while (getchar() != '\n');
+
+			    break;
 			default:
 				break;
 		}
