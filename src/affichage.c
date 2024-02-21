@@ -1,11 +1,12 @@
 #include "matrix.h"
 #include "keygen.h"
+#include "keyread.h"
+#include "encrypt.h"
+#include "decrypt.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <string.h>
-#include <encrypt.h>
-#include <decrypt.h>
 #define MAX_LENGTH 255
 
 void clearTerminal() {
@@ -21,92 +22,6 @@ void clearInputBuffer() {
     while ((c = getchar()) != '\n' && c != EOF);
 }
 
-int nbligne(char *nomFichier) {
-    FILE *fichier = fopen(nomFichier, "r");
-
-    if (fichier == NULL) {
-        fprintf(stderr, "Impossible d'ouvrir le fichier %s.\n", nomFichier);
-        exit(EXIT_FAILURE);
-    }
-
-    int nbligne = 0;
-    char ligne[2000];
-
-    while (fgets(ligne, sizeof(ligne), fichier) != NULL) {
-        nbligne++;
-    }
-
-    fclose(fichier);
-
-    return nbligne;
-}
-
-void privateShape(char *nomFichier, int * size1, int * size2) {
-    FILE *fichier;
-    fichier = fopen(nomFichier, "r");
-
-    if (fichier == NULL) {
-        fprintf(stderr, "Impossible d'ouvrir le fichier %s.\n", nomFichier);
-        exit(EXIT_FAILURE);
-    }
-
-    fscanf(fichier, "%d %d", size1, size2);
-
-    fclose(fichier);
-}
-
-void LireClePublique(char * fichiercle, int taille, int matrix[taille][taille]) {
-    FILE *fichier;
-    fichier = fopen(fichiercle, "r");
-
-    if (fichier == NULL) {
-        fprintf(stderr, "Erreur : Impossible d'ouvrir le fichier %s\n", fichiercle);
-		exit(EXIT_FAILURE);
-    }
-
-
-    printf("\e[45;37;1m  Clé publique :\e[0m\e[45;37m");
-    for(int i=0;i<10;i++) printf(" ");
-    printf("\e[35;47m\n██");
-	char caractere;
-    char buffer[100];
-    int index = 0;
-
-    int i = 0;
-    int j = 0;
-
-    while ((caractere = fgetc(fichier)) != EOF) {
-        if (caractere == ' ') {
-            buffer[index] = '\0';
-
-            if(buffer!="") {
-            	int nombre = atof(buffer);
-            	if(taille>0) {
-            		matrix[i][j]=nombre;
-            		j++;
-            	}
-            	//printf("%-10d", (int)nombre);
-            	printf("%d", nombre);
-            }
-
-            index = 0;
-            printf(" ");
-        } else if(caractere == '\n') {
-        	j=0;
-        	i++;
-        	printf("██\n██");
-        } else {
-            buffer[index++] = caractere;
-        }
-    }
-
-    for(int i=0;i<24;i++) printf("█");
-   	printf("\e[0m");
-    fclose(fichier);
-}
-
-void LireClePrive(char * nomFichier, int size1, int size2, int ** S, int ** G, int ** P) {
-}
 
 void Affichage() {
 
@@ -139,7 +54,7 @@ void Affichage() {
 				struct stat st;
 			    if (stat(".mceliece", &st) == 0) {
 			    	int factice[0][0];
-			        LireClePublique(".mceliece/.public_key", 0, factice);
+			        LireClePublique(".mceliece/.public_key", 0, factice, 1);
 
 			        printf("\n\n");
 			        printf("\e[31;47m Le .mceliece existe déjà, souhaitez-vous l'écraser ? \e[41;05;37m [o/n] \e[0m ");
@@ -183,7 +98,7 @@ void Affichage() {
 			    if(sz>0) {
 			    	int public_key[sz][sz];
 			    	printf("\n");
-			    	LireClePublique(buffer, sz, public_key);
+			    	LireClePublique(buffer, sz, public_key, 1);
 			    	printf("\n\n");
 			    	printf("Que souhaitez-vous chiffrer ? ");
 			    	fgets(msg, sizeof(msg), stdin);
