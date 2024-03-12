@@ -14,8 +14,9 @@ int main(int argc, char * argv[]) {
         printf("Utilisation :\n");
         printf("pour générer une clé : %s --keygen \n", argv[0]);
         printf("pour chiffrer sans préciser la clé : %s -e \"message\"\n", argv[0]);
-        printf("pour chiffrer en précisant la clé : %s -e \"message\" -k /path/to/the/key \n", argv[0]);
-        printf("pour déchiffrer en précisant la clé : %s -e \"message\" -k /path/to/the/key \n", argv[0]);
+        printf("pour chiffrer en précisant la clé : %s -e \"message\" -k /path/to/the/public/key \n", argv[0]);
+        printf("pour déchiffrer sans préciser la clé : %s -d \"message\"\n", argv[0]);
+        printf("pour déchiffrer en précisant la clé : %s -d \"message\" -k /path/to/the/private/key \n", argv[0]);
     } else if(argc ==2 && strcmp(argv[1], "--keygen") == 0) {
 		struct stat st;
     	if (stat(".mceliece", &st) == 0) {
@@ -31,13 +32,30 @@ int main(int argc, char * argv[]) {
     	} else {
 			strcpy(buffer, ".mceliece/.public_key");
 		}
-		
+
 		int sz=nbligne(buffer);
 	    if(sz>0) {
 	    	int public_key[sz][sz];
 	    	LireClePublique(buffer, sz, public_key, 0);
 	    	fprintf(stdout, encrypt(strlen(argv[2])-1,argv[2], sz, public_key));
 	    	fprintf(stdout, "\n");
+	    }
+	} else if ((argc == 5 || argc == 3) && strcmp(argv[1], "-d") == 0) {
+    	char buffer[256];
+    	if(argc == 5 && strcmp(argv[3], "-k") == 0) {
+			strcpy(buffer, argv[4]);
+    	} else {
+			strcpy(buffer, ".mceliece/.private_key");
+		}
+
+		int sz=nbligne(buffer);
+	    if(sz>0) {
+	    	/////////////////////////////////////////
+			// Ecrire ici le code pour dechiffrer  //
+			// TODO                                //
+			/////////////////////////////////////////
+			fprintf(stdout, "output");
+			fprintf(stdout, "\n");
 	    }
 	} else {
 		Affichage();
