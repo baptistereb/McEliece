@@ -24,10 +24,6 @@ char * encrypt(int size, char msg[size], int public_size, int public[public_size
         }
     }
 
-    //for(int i=0;i<size*8;i++) printf("%d ", binaryMsg[i]);
-   	//printf("\n");
-
-
 	int numRows = (int)ceil((double)(8 * size) / public_size);
     int message[numRows][public_size];
 
@@ -41,16 +37,10 @@ char * encrypt(int size, char msg[size], int public_size, int public[public_size
         }
     }
 
-    //PrintMatrixRect(numRows, public_size,message, "matrice message");
-
     int mG[numRows][public_size];
 	multMatrix(numRows,public_size,public_size, message, public, mG);
 
-    //PrintMatrixRect(numRows, public_size,mG, "matrice mG");
-
 	bitFlipRandom(numRows, public_size, mG);
-
-    //PrintMatrixRect(numRows, public_size,mG, "matrice mG avec bitflip");
 
     char * result = malloc((numRows*public_size+1)*sizeof(char));
     for(int i=0;i<numRows;i++) {

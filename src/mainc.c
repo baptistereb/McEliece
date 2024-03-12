@@ -31,15 +31,14 @@ int main(int argc, char * argv[]) {
     	} else {
 			strcpy(buffer, ".mceliece/.public_key");
 		}
-		//ne fonctionne pas pour l'instant et j'ignore pk (a comparer avec le ./exec via verbose)
-	    /*
+		
 		int sz=nbligne(buffer);
 	    if(sz>0) {
 	    	int public_key[sz][sz];
 	    	LireClePublique(buffer, sz, public_key, 0);
 	    	fprintf(stdout, encrypt(strlen(argv[2])-1,argv[2], sz, public_key));
 	    	fprintf(stdout, "\n");
-	    }/**/
+	    }
 	} else {
 		Affichage();
     }
